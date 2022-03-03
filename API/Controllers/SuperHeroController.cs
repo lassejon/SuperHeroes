@@ -18,17 +18,18 @@ public class SuperHeroController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<SuperHero>>> Get()
     {
-        return Ok(await _superHeroContext.Superheroes.ToListAsync());
+        var superheroes = await _superHeroContext.Superheroes.ToListAsync();
+        return Ok(superheroes);
     }
     
-    [HttpGet("{id}")]
+    [HttpGet("{id}", Name = "GetSuperHero")]
     public async Task<ActionResult<SuperHero>> Get(int id)
     {
         var hero = await _superHeroContext.Superheroes.FindAsync(id);
 
         if (hero is null)
         {
-            return BadRequest("Hero not found.");
+            return NotFound("Hero not found.");
         }
         
         return Ok(hero);
@@ -41,7 +42,7 @@ public class SuperHeroController : ControllerBase
         _superHeroContext.Superheroes.Add(heroRequest);
         await _superHeroContext.SaveChangesAsync();
         
-        return Ok(await _superHeroContext.Superheroes.ToListAsync());
+        return CreatedAtRoute("GetSuperHero", new { id = heroRequest.Id}, heroRequest);
     }
     
     // PUT
